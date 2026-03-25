@@ -38,3 +38,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/web
           force_orphan: true
+      - name: Build Web
+  run: flutter build web --release --base-href /wixoss_vs_web/
