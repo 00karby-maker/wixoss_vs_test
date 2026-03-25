@@ -1,10 +1,10 @@
 name: Deploy Flutter Web to GitHub Pages
 
-# main ブランチに push したときに自動実行
 on:
   push:
     branches:
       - main
+
 permissions:
   contents: write
 
@@ -21,15 +21,15 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable  # 使用したい Flutter バージョン
+          channel: stable
 
       # 3. 依存関係をインストール
       - name: Install dependencies
         run: flutter pub get
 
-      # 4. Web 向けにビルド
+      # 4. Webビルド（ここを修正）
       - name: Build Flutter Web
-        run: flutter build web --release
+        run: flutter build web --release --base-href /wixoss_vs_web/
 
       # 5. GitHub Pages にデプロイ
       - name: Deploy to GitHub Pages
@@ -38,5 +38,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/web
           force_orphan: true
-      - name: Build Web
-  run: flutter build web --release --base-href /wixoss_vs_web/
