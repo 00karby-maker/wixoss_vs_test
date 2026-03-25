@@ -1,6 +1,6 @@
-name: Deploy Flutter Web
+name: Deploy Flutter Web to GitHub Pages
 
-# main ブランチに push したときにトリガー
+# main ブランチに push したときに自動実行
 on:
   push:
     branches:
@@ -11,20 +11,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. リポジトリをチェックアウト
-      - uses: actions/checkout@v3
+      # 1. リポジトリをクローン
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       # 2. Flutter をセットアップ
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.0'  # Flutter のバージョンに合わせて変更
+          flutter-version: '3.13.0'  # 使用したい Flutter バージョン
 
-      # 3. Flutter Web ビルド
-      - run: flutter build web --release
+      # 3. 依存関係をインストール
+      - name: Install dependencies
+        run: flutter pub get
 
-      # 4. gh-pages ブランチにデプロイ
-      - uses: peaceiris/actions-gh-pages@v3
+      # 4. Web 向けにビルド
+      - name: Build Flutter Web
+        run: flutter build web --release
+
+      # 5. GitHub Pages にデプロイ
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
-          publish_branch: gh-pages
+          publish_dir: build/web
