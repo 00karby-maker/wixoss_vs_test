@@ -178,7 +178,7 @@ class _StatsPageState extends State<StatsPage> {
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
-                        showTitles: true,
+                        showTitles: false,
                         interval: 20,
                         getTitlesWidget: (value, meta) => Text(
                           "${value.toInt()}%",
@@ -189,34 +189,19 @@ class _StatsPageState extends State<StatsPage> {
                       ),
                     ),
                     bottomTitles: AxisTitles(
-  sideTitles: SideTitles(
-    showTitles: true,
-    getTitlesWidget: (value, meta) {
-      final i = value.toInt();
-      if (i >= entries.length) return const SizedBox();
-
-      String label;
-      if (i == 0) {
-        label = "Tier1";
-      } else if (i == 1) {
-        label = "Tier2";
-      } else if (i == 2) {
-        label = "Tier3";
-      } else if (i == 3) {
-        label = "Tier4";
-      } else if (i == 4) {
-        label = "Tier5";
-      } else {
-        label = (i + 1).toString(); // 6位以降は数字表示
-      }
-
-      return Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: Text(label, style: const TextStyle(fontSize: 10)),
-      );
-    },
-  ),
-),
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final i = value.toInt();
+                          if (i >= entries.length) return const SizedBox();
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(entries[i].key,
+                                style: const TextStyle(fontSize: 10)),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                   barTouchData: BarTouchData(
                     enabled: true,
