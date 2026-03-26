@@ -73,8 +73,10 @@ class _StatsPageState extends State<StatsPage> {
         final totalB = b.value["total"]!;
         final rateB = totalB == 0 ? 0 : winB / totalB;
 
+        // 勝率優先 → 同率なら試合数
         final cmp = rateB.compareTo(rateA);
         if (cmp != 0) return cmp;
+
         return totalB.compareTo(totalA);
       });
 
@@ -83,6 +85,7 @@ class _StatsPageState extends State<StatsPage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          /// フィルター
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -99,7 +102,9 @@ class _StatsPageState extends State<StatsPage> {
               ),
             ),
           ),
+
           const SizedBox(height: 16),
+
           buildPie("使用ルリグ割合", used),
           buildPie("対戦ルリグ割合", opp),
           buildBar(entries, winMap),
@@ -144,12 +149,10 @@ class _StatsPageState extends State<StatsPage> {
     );
   }
 
-  /// 棒グラフ（勝率）＋Tier丸ラベル
+  /// 棒グラフ（勝率）
   Widget buildBar(
       List<MapEntry<String, Map<String, int>>> entries,
       Map<String, Map<String, int>> winMap) {
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       child: Padding(
@@ -160,127 +163,92 @@ class _StatsPageState extends State<StatsPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             SizedBox(
-              height: 280,
-              child: Stack(
-                children: [
-                  BarChart(
-                    BarChartData(
-                      maxY: 100,
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: 20,
-                            getTitlesWidget: (value, meta) => Text(
-                              "${value.toInt()}%",
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: isDark ? Colors.white70 : Colors.black87),
-                            ),
-                          ),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (value, meta) {
-                              final i = value.toInt();
-                              if (i >= entries.length) return const SizedBox();
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(entries[i].key,
-                                    style: const TextStyle(fontSize: 10)),
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
+              height: 260,
+              child: BarChart(
+                BarChartData(
+                  maxY: 100,
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 20,
+                        getTitlesWidget: (value, meta) => Text(
+                          "${value.toInt()}%",
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white70
+                                  : Colors.black87),
                         ),
                       ),
-                      barTouchData: BarTouchData(
-                        enabled: true,
-                        touchTooltipData: BarTouchTooltipData(
-                          tooltipBgColor: Colors.black87,
-                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                            final name = entries[groupIndex].key;
-                            final win = winMap[name]!["win"]!;
-                            final total = winMap[name]!["total"]!;
-                            final rate = total == 0 ? 0.0 : (win / total * 100);
-                            return BarTooltipItem(
-                              "$name\n${rate.toStringAsFixed(1)}%\n$win勝 / $total戦",
-                              const TextStyle(color: Colors.white),
-                            );
-                          },
-                        ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final i = value.toInt();
+                          if (i >= entries.length) return const SizedBox();
+                          // 下部はルリグ名
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(entries[i].key,
+                                style: const TextStyle(fontSize: 10)),
+                          );
+                        },
                       ),
-                      barGroups: List.generate(entries.length, (i) {
-                        final name = entries[i].key;
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final i = value.toInt();
+                          if (i >= entries.length) return const SizedBox();
+                          // 上位5位はTier1〜Tier5、それ以降は数字表示
+                          final label = i < 5 ? "Tier${i + 1}" : "$i";
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(label,
+                                style: const TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold)),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  barTouchData: BarTouchData(
+                    enabled: true,
+                    touchTooltipData: BarTouchTooltipData(
+                      tooltipBgColor: Colors.black87,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final name = entries[groupIndex].key;
                         final win = winMap[name]!["win"]!;
                         final total = winMap[name]!["total"]!;
                         final rate = total == 0 ? 0.0 : (win / total * 100);
-                        return BarChartGroupData(
-                          x: i,
-                          barRods: [
-                            BarChartRodData(
-                              toY: rate.toDouble(),
-                              color: lrigColor(name),
-                              width: 18,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-                  ),
-                  // 上位5位Tierマーク（丸＋番号）を棒の上に重ねる
-                  Positioned.fill(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final barWidth = 18.0;
-                        final spacing = (constraints.maxWidth - entries.length * barWidth) /
-                            (entries.length + 1);
-
-                        return Stack(
-                          children: List.generate(entries.length, (i) {
-                            if (i >= 5) return const SizedBox(); // 6位以降はマークなし
-
-                            final name = entries[i].key;
-                            final win = winMap[name]!["win"]!;
-                            final total = winMap[name]!["total"]!;
-                            final rate = total == 0 ? 0.0 : (win / total * 100);
-
-                            final x = spacing * (i + 1) + barWidth * i + barWidth / 2;
-                            final y = constraints.maxHeight * (1 - rate / 100) - 12;
-
-                            return Positioned(
-                              left: x - 10,
-                              top: y,
-                              child: Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  color: lrigColor(name),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: Colors.white, width: 1.5),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "${i + 1}",
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
+                        return BarTooltipItem(
+                          "$name\n${rate.toStringAsFixed(1)}%\n$win勝 / $total戦",
+                          const TextStyle(color: Colors.white),
                         );
                       },
                     ),
                   ),
-                ],
+                  barGroups: List.generate(entries.length, (i) {
+                    final name = entries[i].key;
+                    final win = winMap[name]!["win"]!;
+                    final total = winMap[name]!["total"]!;
+                    final rate = total == 0 ? 0.0 : (win / total * 100);
+                    return BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: rate.toDouble(),
+                          color: lrigColor(name),
+                          width: 18,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
               ),
             ),
           ],
