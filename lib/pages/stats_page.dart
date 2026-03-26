@@ -14,19 +14,13 @@ class _StatsPageState extends State<StatsPage> {
   String format = "∀";
 
   Color lrigColor(String name) {
-  final hash = name.hashCode;
+    final hash = name.hashCode;
+    final hue = ((hash * 137) % 360 + 360) % 360;
+    const saturation = 0.6;
+    const lightness = 0.5;
 
-  final hue = ((hash * 137) % 360 + 360) % 360;
-  const saturation = 0.6;
-  const lightness = 0.5;
-
-  return HSLColor.fromAHSL(
-    1.0,
-    hue.toDouble(),
-    saturation,
-    lightness
-  ).toColor();
-}
+    return HSLColor.fromAHSL(1.0, hue.toDouble(), saturation, lightness).toColor();
+  }
 
   /// データ取得
   List<MatchRecord> getRecords(Box<MatchRecord> box) {
@@ -70,21 +64,21 @@ class _StatsPageState extends State<StatsPage> {
     final opp = countBy(box, false);
     final winMap = winData(box);
     final entries = winMap.entries.toList()
-  ..sort((a, b) {
-    final winA = a.value["win"]!;
-    final totalA = a.value["total"]!;
-    final rateA = totalA == 0 ? 0 : winA / totalA;
+      ..sort((a, b) {
+        final winA = a.value["win"]!;
+        final totalA = a.value["total"]!;
+        final rateA = totalA == 0 ? 0 : winA / totalA;
 
-    final winB = b.value["win"]!;
-    final totalB = b.value["total"]!;
-    final rateB = totalB == 0 ? 0 : winB / totalB;
+        final winB = b.value["win"]!;
+        final totalB = b.value["total"]!;
+        final rateB = totalB == 0 ? 0 : winB / totalB;
 
-    // 勝率優先 → 同率なら試合数
-    final cmp = rateB.compareTo(rateA);
-    if (cmp != 0) return cmp;
+        // 勝率優先 → 同率なら試合数
+        final cmp = rateB.compareTo(rateA);
+        if (cmp != 0) return cmp;
 
-    return totalB.compareTo(totalA);
-  });
+        return totalB.compareTo(totalA);
+      });
 
     return SingleChildScrollView(
       key: ValueKey(format),
@@ -194,10 +188,11 @@ class _StatsPageState extends State<StatsPage> {
                         getTitlesWidget: (value, meta) {
                           final i = value.toInt();
                           if (i >= entries.length) return const SizedBox();
+                          // 上位5位はTier1〜Tier5、それ以降は数字
+                          final label = i < 5 ? "Tier${i + 1}" : "$i";
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
-                            child: Text(entries[i].key,
-                                style: const TextStyle(fontSize: 10)),
+                            child: Text(label, style: const TextStyle(fontSize: 10)),
                           );
                         },
                       ),
