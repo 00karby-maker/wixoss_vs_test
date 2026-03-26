@@ -115,7 +115,6 @@ class _StatsPageState extends State<StatsPage> {
 
   /// 円グラフ
   Widget buildPie(String title, Map<String, int> data) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final total = data.values.fold<int>(0, (a, b) => a + b);
 
     return Card(
@@ -154,7 +153,6 @@ class _StatsPageState extends State<StatsPage> {
   Widget buildBar(
       List<MapEntry<String, Map<String, int>>> entries,
       Map<String, Map<String, int>> winMap) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       child: Padding(
@@ -165,20 +163,22 @@ class _StatsPageState extends State<StatsPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             SizedBox(
-              height: 240,
+              height: 260,
               child: BarChart(
                 BarChartData(
                   maxY: 100,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
-                        showTitles: false,
+                        showTitles: true,
                         interval: 20,
                         getTitlesWidget: (value, meta) => Text(
                           "${value.toInt()}%",
                           style: TextStyle(
                               fontSize: 10,
-                              color: isDark ? Colors.white70 : Colors.black87),
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white70
+                                  : Colors.black87),
                         ),
                       ),
                     ),
@@ -188,11 +188,28 @@ class _StatsPageState extends State<StatsPage> {
                         getTitlesWidget: (value, meta) {
                           final i = value.toInt();
                           if (i >= entries.length) return const SizedBox();
-                          // 上位5位はTier1〜Tier5、それ以降は数字
-                          final label = i < 5 ? "Tier${i + 1}" : "$i";
+                          // 下部はルリグ名
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
-                            child: Text(label, style: const TextStyle(fontSize: 10)),
+                            child: Text(entries[i].key,
+                                style: const TextStyle(fontSize: 10)),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final i = value.toInt();
+                          if (i >= entries.length) return const SizedBox();
+                          // 上位5位はTier1〜Tier5、それ以降は数字表示
+                          final label = i < 5 ? "Tier${i + 1}" : "$i";
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(label,
+                                style: const TextStyle(
+                                    fontSize: 10, fontWeight: FontWeight.bold)),
                           );
                         },
                       ),
