@@ -20,7 +20,12 @@ class _StatsPageState extends State<StatsPage> {
   const saturation = 0.6;
   const lightness = 0.5;
 
-  return HSLColor.fromAHSL(1.0, hue, saturation, lightness).toColor();
+  return HSLColor.fromAHSL(
+    1.0,
+    hue.toDouble(),
+    saturation,
+    lightness
+  ).toColor();
 }
 
   /// データ取得
@@ -74,7 +79,11 @@ class _StatsPageState extends State<StatsPage> {
     final totalB = b.value["total"]!;
     final rateB = totalB == 0 ? 0 : winB / totalB;
 
-    return rateB.compareTo(rateA); // ← 高い順
+    // 勝率優先 → 同率なら試合数
+    final cmp = rateB.compareTo(rateA);
+    if (cmp != 0) return cmp;
+
+    return totalB.compareTo(totalA);
   });
 
     return SingleChildScrollView(
