@@ -40,6 +40,16 @@ class _InputPageState extends State<InputPage> {
   final eventCtrl = TextEditingController();
   final usedCtrl = TextEditingController();
 
+final List<String> lrigList = [
+  "リメンバ",
+  "ピルルク",
+  "タマ",
+  "ウリス",
+  "ドーナ",
+  "アン",
+  "エルドラ",
+];
+  
   DateTime date = DateTime.now();
   String format = "A";
 
