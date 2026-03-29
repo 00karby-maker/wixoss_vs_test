@@ -14,8 +14,7 @@ class InputPage extends StatefulWidget {
 }
 
 class MatchInput {
-  late TextEditingController opponentCtrl;
-  String opponentLrig = "";
+  String opponentLrig = "タマ";
   String firstSecond = "先手";
   String result = "勝";
   int selfLb = 0;
@@ -26,7 +25,6 @@ class MatchInput {
   late TextEditingController memoCtrl;
 
   MatchInput() {
-    opponentCtrl = TextEditingController();
     memoCtrl = TextEditingController(text: memo);
   }
 
@@ -95,9 +93,9 @@ final List<String> lrigList = [
           eventName: eventCtrl.text,
           date: date,
           format: format,
-          usedLrig: usedCtrl.text,
+          usedLrig: selectedUsedLrig,
           round: i + 1,
-          opponentLrig: m.opponentCtrl.text,
+          opponentLrig: m.opponentLrig,
           firstSecond: m.firstSecond,
           result: m.result,
           selfLb: m.selfLb,
@@ -178,7 +176,16 @@ setState(() {
           ),
 
           label("使用ルリグ"),
-          TextField(controller: usedCtrl),
+          String selectedUsedLrig = "タマ"; // 初期値追加（Stateに）
+
+DropdownButton(
+  value: selectedUsedLrig,
+  isExpanded: true,
+  items: lrigList
+      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+      .toList(),
+  onChanged: (v) => setState(() => selectedUsedLrig = v!),
+),
 
           label("フォーマット"),
           DropdownButton(
@@ -204,9 +211,14 @@ setState(() {
                     label("対戦 ${i + 1}"),
 
                     label("対面ルリグ"),
-                    TextField(
-                      controller: m.opponentCtrl, // ← ここでコントローラを使用
-                    ),
+                    DropdownButton(
+  value: m.opponentLrig,
+  isExpanded: true,
+  items: lrigList
+      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+      .toList(),
+  onChanged: (v) => setState(() => m.opponentLrig = v!),
+),
 
                     label("先後"),
                     DropdownButton(
