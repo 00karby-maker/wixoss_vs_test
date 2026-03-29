@@ -237,7 +237,7 @@ class _InputPageState extends State<InputPage> {
       setState(() => m.opponentLrig = v);
     },
   ),
-)
+) ,
 
                     label("先後"),
                     DropdownButton<String>(
