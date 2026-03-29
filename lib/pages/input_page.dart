@@ -176,7 +176,7 @@ setState(() {
 
           label("使用ルリグ"),
 DropdownButtonFormField<String>(
-  value: format,
+  valuvalue: selectedUsedLrig,
   decoration: const InputDecoration(border: OutlineInputBorder()),
   items: lrigList
       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
