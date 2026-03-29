@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart'; // ← 追加
+import 'package:flutter/foundation.dart';
 
 import '../model/match_record.dart';
 
@@ -20,13 +20,11 @@ class MatchInput {
   String result = "勝";
   int selfLb = 0;
   int opponentLb = 0;
-  String memo = "";
 
-  // メモ用コントローラ
   late TextEditingController memoCtrl;
 
   MatchInput() {
-    memoCtrl = TextEditingController(text: memo);
+    memoCtrl = TextEditingController();
   }
 
   void dispose() {
@@ -39,16 +37,16 @@ class _InputPageState extends State<InputPage> {
 
   String selectedUsedLrig = "タマ";
 
-final List<String> lrigList = [
-  "リメンバ",
-  "ピルルク",
-  "タマ",
-  "ウリス",
-  "ドーナ",
-  "アン",
-  "エルドラ",
-];
-  
+  final List<String> lrigList = [
+    "リメンバ",
+    "ピルルク",
+    "タマ",
+    "ウリス",
+    "ドーナ",
+    "アン",
+    "エルドラ",
+  ];
+
   DateTime date = DateTime.now();
   String format = "A";
 
@@ -56,7 +54,6 @@ final List<String> lrigList = [
 
   String? imagePath;
 
-  /// ラベル
   Widget label(String t) => Padding(
         padding: const EdgeInsets.only(top: 10),
         child: Align(
@@ -65,10 +62,9 @@ final List<String> lrigList = [
         ),
       );
 
-  /// 画像選択
   Future<void> pickImage() async {
     if (kIsWeb) return;
-    
+
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
 
@@ -84,7 +80,6 @@ final List<String> lrigList = [
     });
   }
 
-  /// 保存
   void save() {
     final box = Hive.box<MatchRecord>('records');
 
@@ -109,23 +104,21 @@ final List<String> lrigList = [
       );
     }
 
-    /// 🔥 完全リセット
-setState(() {
-  eventCtrl.clear();
-  imagePath = null;
-  date = DateTime.now();
-  format = "A";
-  selectedUsedLrig = "タマ";
+    setState(() {
+      eventCtrl.clear();
+      imagePath = null;
+      date = DateTime.now();
+      format = "A";
+      selectedUsedLrig = "タマ";
 
-  // 古いコントローラを破棄して、新しい対戦1件に置き換え
-  for (var m in matches) {
-    m.dispose();
-  }
-  matches = [MatchInput()]; // 対戦数は1件にリセット
-});
+      for (var m in matches) {
+        m.dispose();
+      }
+      matches = [MatchInput()];
+    });
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text("保存しました")),
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("保存しました")),
     );
   }
 
@@ -140,19 +133,19 @@ setState(() {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      child: Column(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(), // ← フォーカス解除
+      child: ListView(
+        padding: const EdgeInsets.all(12),
         children: [
-          /// 画像
           label("デッキレシピ"),
           ElevatedButton(
             onPressed: pickImage,
             child: const Text("画像を選択"),
           ),
-          
+
           if (!kIsWeb && imagePath != null && File(imagePath!).existsSync())
-  Image.file(File(imagePath!), height: 120),
+            Image.file(File(imagePath!), height: 120),
 
           label("大会名"),
           TextField(controller: eventCtrl),
@@ -160,6 +153,7 @@ setState(() {
           label("日付"),
           GestureDetector(
             onTap: () async {
+              FocusScope.of(context).unfocus();
               final picked = await showDatePicker(
                 context: context,
                 initialDate: date,
@@ -179,32 +173,36 @@ setState(() {
           ),
 
           label("使用ルリグ"),
-DropdownButtonFormField<String>(
-  value: selectedUsedLrig,
-  style: const TextStyle(color: Colors.white),          // ← ここ追加
-  dropdownColor: Colors.grey[900],                      // ← ここ追加
-  decoration: const InputDecoration(border: OutlineInputBorder()),
-  items: lrigList
-      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-      .toList(),
-  onChanged: (v) {
-    if (v == null) return;
-    setState(() => selectedUsedLrig = v);
-  },
-),
+          DropdownButtonFormField<String>(
+            value: lrigList.contains(selectedUsedLrig)
+                ? selectedUsedLrig
+                : lrigList.first,
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            items: lrigList
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) {
+              FocusScope.of(context).unfocus();
+              if (v == null) return;
+              setState(() => selectedUsedLrig = v);
+            },
+          ),
+
           label("フォーマット"),
-          DropdownButton(
+          DropdownButton<String>(
             value: format,
             isExpanded: true,
             items: ['A', 'K', 'D']
                 .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                 .toList(),
-            onChanged: (v) => setState(() => format = v!),
+            onChanged: (v) {
+              FocusScope.of(context).unfocus();
+              setState(() => format = v!);
+            },
           ),
 
           const SizedBox(height: 10),
 
-          /// 対戦入力
           ...List.generate(matches.length, (i) {
             final m = matches[i];
 
@@ -217,68 +215,83 @@ DropdownButtonFormField<String>(
 
                     label("対面ルリグ"),
                     DropdownButtonFormField<String>(
-  value: m.opponentLrig,
-                      style: const TextStyle(color: Colors.white),          // ← 追加
-  dropdownColor: Colors.grey[900],                      // ← 追加
-  decoration: const InputDecoration(
-    border: OutlineInputBorder(),
-    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-  ),
-  items: lrigList
-      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-      .toList(),
-  onChanged: (v) {
-    if (v == null) return;
-    setState(() => m.opponentLrig = v);
-  },
-),
+                      value: lrigList.contains(m.opponentLrig)
+                          ? m.opponentLrig
+                          : lrigList.first,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                      items: lrigList
+                          .map((e) =>
+                              DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (v) {
+                        FocusScope.of(context).unfocus();
+                        if (v == null) return;
+                        setState(() => m.opponentLrig = v);
+                      },
+                    ),
 
                     label("先後"),
-                    DropdownButton(
+                    DropdownButton<String>(
                       value: m.firstSecond,
                       isExpanded: true,
                       items: ["先手", "後手"]
                           .map((e) =>
                               DropdownMenuItem(value: e, child: Text(e)))
                           .toList(),
-                      onChanged: (v) => setState(() => m.firstSecond = v!),
+                      onChanged: (v) {
+                        FocusScope.of(context).unfocus();
+                        setState(() => m.firstSecond = v!);
+                      },
                     ),
 
                     label("勝敗"),
-                    DropdownButton(
+                    DropdownButton<String>(
                       value: m.result,
                       isExpanded: true,
                       items: ["勝", "負"]
                           .map((e) =>
                               DropdownMenuItem(value: e, child: Text(e)))
                           .toList(),
-                      onChanged: (v) => setState(() => m.result = v!),
+                      onChanged: (v) {
+                        FocusScope.of(context).unfocus();
+                        setState(() => m.result = v!);
+                      },
                     ),
 
                     label("LB数:自/被"),
                     Row(
                       children: [
                         Expanded(
-                          child: DropdownButton(
+                          child: DropdownButton<int>(
                             value: m.selfLb,
                             isExpanded: true,
                             items: List.generate(
-                                10,
-                                (i) =>
-                                    DropdownMenuItem(value: i, child: Text("$i"))),
-                            onChanged: (v) => setState(() => m.selfLb = v!),
+                              10,
+                              (i) => DropdownMenuItem(
+                                  value: i, child: Text("$i")),
+                            ),
+                            onChanged: (v) {
+                              FocusScope.of(context).unfocus();
+                              setState(() => m.selfLb = v!);
+                            },
                           ),
                         ),
                         const Text("-"),
                         Expanded(
-                          child: DropdownButton(
+                          child: DropdownButton<int>(
                             value: m.opponentLb,
                             isExpanded: true,
                             items: List.generate(
-                                10,
-                                (i) =>
-                                    DropdownMenuItem(value: i, child: Text("$i"))),
-                            onChanged: (v) => setState(() => m.opponentLb = v!),
+                              10,
+                              (i) => DropdownMenuItem(
+                                  value: i, child: Text("$i")),
+                            ),
+                            onChanged: (v) {
+                              FocusScope.of(context).unfocus();
+                              setState(() => m.opponentLb = v!);
+                            },
                           ),
                         ),
                       ],
@@ -290,7 +303,6 @@ DropdownButtonFormField<String>(
                       maxLines: null,
                     ),
 
-                    const SizedBox(height: 10),
                     if (matches.length > 1)
                       ElevatedButton(
                         onPressed: () {
