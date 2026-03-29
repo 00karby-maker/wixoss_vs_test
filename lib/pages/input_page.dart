@@ -175,13 +175,16 @@ setState(() {
           ),
 
           label("使用ルリグ"),
-DropdownButton(
-  value: selectedUsedLrig,
-  isExpanded: true,
+DropdownButtonFormField<String>(
+  value: format,
+  decoration: const InputDecoration(border: OutlineInputBorder()),
   items: lrigList
       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
       .toList(),
-  onChanged: (v) => setState(() => selectedUsedLrig = v!),
+  onChanged: (v) {
+    if (v == null) return;
+    setState(() => selectedUsedLrig = v);
+  },
 ),
           label("フォーマット"),
           DropdownButton(
@@ -207,13 +210,19 @@ DropdownButton(
                     label("対戦 ${i + 1}"),
 
                     label("対面ルリグ"),
-                    DropdownButton(
+                    DropdownButtonFormField<String>(
   value: m.opponentLrig,
-  isExpanded: true,
+  decoration: const InputDecoration(
+    border: OutlineInputBorder(),
+    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+  ),
   items: lrigList
       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
       .toList(),
-  onChanged: (v) => setState(() => m.opponentLrig = v!),
+  onChanged: (v) {
+    if (v == null) return;
+    setState(() => m.opponentLrig = v);
+  },
 ),
 
                     label("先後"),
