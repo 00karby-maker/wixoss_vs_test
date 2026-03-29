@@ -150,8 +150,9 @@ setState(() {
             onPressed: pickImage,
             child: const Text("画像を選択"),
           ),
-          if (imagePath != null && File(imagePath!).existsSync())
-              Image.file(File(imagePath!), height: 120),
+          
+          if (!kIsWeb && imagePath != null && File(imagePath!).existsSync())
+  Image.file(File(imagePath!), height: 120),
 
           label("大会名"),
           TextField(controller: eventCtrl),
