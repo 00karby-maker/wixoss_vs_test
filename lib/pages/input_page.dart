@@ -191,7 +191,7 @@ class _InputPageState extends State<InputPage> {
       setState(() => selectedUsedLrig = v);
     },
   ),
-)
+),
 
           label("フォーマット"),
           DropdownButton<String>(
