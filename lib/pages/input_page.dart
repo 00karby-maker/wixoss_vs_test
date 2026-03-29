@@ -177,6 +177,8 @@ setState(() {
           label("使用ルリグ"),
 DropdownButtonFormField<String>(
   value: selectedUsedLrig,
+  style: const TextStyle(color: Colors.white),          // ← ここ追加
+  dropdownColor: Colors.grey[900],                      // ← ここ追加
   decoration: const InputDecoration(border: OutlineInputBorder()),
   items: lrigList
       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -212,6 +214,8 @@ DropdownButtonFormField<String>(
                     label("対面ルリグ"),
                     DropdownButtonFormField<String>(
   value: m.opponentLrig,
+                      style: const TextStyle(color: Colors.white),          // ← 追加
+  dropdownColor: Colors.grey[900],                      // ← 追加
   decoration: const InputDecoration(
     border: OutlineInputBorder(),
     contentPadding: EdgeInsets.symmetric(horizontal: 10),
