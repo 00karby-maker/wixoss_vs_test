@@ -172,8 +172,6 @@ setState(() {
           ),
 
           label("使用ルリグ"),
-          String selectedUsedLrig = "タマ"; // 初期値追加（Stateに）
-
 DropdownButton(
   value: selectedUsedLrig,
   isExpanded: true,
@@ -182,7 +180,6 @@ DropdownButton(
       .toList(),
   onChanged: (v) => setState(() => selectedUsedLrig = v!),
 ),
-
           label("フォーマット"),
           DropdownButton(
             value: format,
