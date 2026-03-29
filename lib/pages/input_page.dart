@@ -67,7 +67,7 @@ final List<String> lrigList = [
 
   /// 画像選択
   Future<void> pickImage() async {
-　　if (kIsWeb) return;
+    if (kIsWeb) return;
     
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
