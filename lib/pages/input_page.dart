@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart'; // ← 追加
 
 import '../model/match_record.dart';
 
@@ -66,6 +67,8 @@ final List<String> lrigList = [
 
   /// 画像選択
   Future<void> pickImage() async {
+　　if (kIsWeb) return;
+    
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
 
