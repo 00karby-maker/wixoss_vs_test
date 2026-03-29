@@ -173,20 +173,25 @@ class _InputPageState extends State<InputPage> {
           ),
 
           label("使用ルリグ"),
-          DropdownButtonFormField<String>(
-            value: lrigList.contains(selectedUsedLrig)
-                ? selectedUsedLrig
-                : lrigList.first,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            items: lrigList
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (v) {
-              FocusScope.of(context).unfocus();
-              if (v == null) return;
-              setState(() => selectedUsedLrig = v);
-            },
-          ),
+          Container(
+  padding: const EdgeInsets.symmetric(horizontal: 12),
+  decoration: BoxDecoration(
+    border: Border.all(),
+    borderRadius: BorderRadius.circular(4),
+  ),
+  child: DropdownButton<String>(
+    value: selectedUsedLrig,
+    isExpanded: true,
+    underline: const SizedBox(), // ← 下線消す
+    items: lrigList
+        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+        .toList(),
+    onChanged: (v) {
+      if (v == null) return;
+      setState(() => selectedUsedLrig = v);
+    },
+  ),
+)
 
           label("フォーマット"),
           DropdownButton<String>(
@@ -214,23 +219,25 @@ class _InputPageState extends State<InputPage> {
                     label("対戦 ${i + 1}"),
 
                     label("対面ルリグ"),
-                    DropdownButtonFormField<String>(
-                      value: lrigList.contains(m.opponentLrig)
-                          ? m.opponentLrig
-                          : lrigList.first,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                      items: lrigList
-                          .map((e) =>
-                              DropdownMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                      onChanged: (v) {
-                        FocusScope.of(context).unfocus();
-                        if (v == null) return;
-                        setState(() => m.opponentLrig = v);
-                      },
-                    ),
+                    Container(
+  padding: const EdgeInsets.symmetric(horizontal: 12),
+  decoration: BoxDecoration(
+    border: Border.all(),
+    borderRadius: BorderRadius.circular(4),
+  ),
+  child: DropdownButton<String>(
+    value: m.opponentLrig,
+    isExpanded: true,
+    underline: const SizedBox(),
+    items: lrigList
+        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+        .toList(),
+    onChanged: (v) {
+      if (v == null) return;
+      setState(() => m.opponentLrig = v);
+    },
+  ),
+)
 
                     label("先後"),
                     DropdownButton<String>(
