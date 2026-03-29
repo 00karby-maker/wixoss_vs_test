@@ -36,6 +36,8 @@ class MatchInput {
 class _InputPageState extends State<InputPage> {
   final eventCtrl = TextEditingController();
 
+  String selectedUsedLrig = "タマ";
+
 final List<String> lrigList = [
   "リメンバ",
   "ピルルク",
@@ -110,6 +112,7 @@ setState(() {
   imagePath = null;
   date = DateTime.now();
   format = "A";
+  selectedUsedLrig = "タマ";
 
   // 古いコントローラを破棄して、新しい対戦1件に置き換え
   for (var m in matches) {
