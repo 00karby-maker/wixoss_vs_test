@@ -140,7 +140,7 @@ setState(() {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return ListView(
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
