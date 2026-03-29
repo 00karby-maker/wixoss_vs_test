@@ -29,14 +29,12 @@ class MatchInput {
   }
 
   void dispose() {
-    opponentCtrl.dispose();
     memoCtrl.dispose();
   }
 }
 
 class _InputPageState extends State<InputPage> {
   final eventCtrl = TextEditingController();
-  final usedCtrl = TextEditingController();
 
 final List<String> lrigList = [
   "リメンバ",
@@ -109,7 +107,6 @@ final List<String> lrigList = [
     /// 🔥 完全リセット
 setState(() {
   eventCtrl.clear();
-  usedCtrl.clear();
   imagePath = null;
   date = DateTime.now();
   format = "A";
@@ -129,7 +126,6 @@ setState(() {
   @override
   void dispose() {
     eventCtrl.dispose();
-    usedCtrl.dispose();
     for (var m in matches) {
       m.dispose();
     }
